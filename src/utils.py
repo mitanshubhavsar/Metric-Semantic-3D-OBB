@@ -142,13 +142,14 @@ def obb_corners_3d(center, extent, rotation) -> np.ndarray:
     """
     Compute the 8 corners of an OBB.
     center:   (3,) world-space centre
-    extent:   (3,) half-extents along each OBB axis
+    extent:   (3,) FULL edge lengths along each OBB axis (metres)
     rotation: (3,3) columns = OBB axes in world space
 
+    Corners = center + R * (± extent/2)
     Returns (8,3) corner coordinates.
     """
     c = np.array(center)
-    e = np.array(extent)
+    e = np.array(extent) / 2.0   # full length → half-extent
     R = np.array(rotation)
     corners = []
     for sx in (-1, 1):

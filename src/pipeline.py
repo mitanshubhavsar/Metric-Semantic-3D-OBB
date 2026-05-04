@@ -466,11 +466,13 @@ def save_validation_images(
     """
     os.makedirs(out_dir, exist_ok=True)
     colors = {
-        "vga_socket":      (0, 255, 255),   # yellow
-        "ethernet_socket": (0, 255, 0),     # green
-        "power_socket":    (0, 100, 255),   # orange
-        "usb_socket":      (255, 0, 255),   # magenta
-        "audio_socket":    (255, 200, 0),   # cyan-yellow
+        "vga_socket":           (0, 255, 255),   # yellow
+        "ethernet_socket":      (0, 255, 0),     # green
+        "power_socket":         (0, 100, 255),   # orange
+        "usb_socket":           (255, 0, 255),   # magenta
+        "audio_socket":         (255, 200, 0),   # cyan-yellow
+        "hdmi_socket_left":     (255, 100, 0),   # blue
+        "usb_socket_top_right": (0, 200, 255),   # gold
     }
 
     for frame_num in frames:
@@ -547,7 +549,7 @@ def main():
     )
     parser.add_argument(
         "--entities", nargs="+",
-        default=["vga_socket", "ethernet_socket", "power_socket", "usb_socket", "audio_socket"],
+        default=["ethernet_socket", "power_socket", "hdmi_socket_left", "usb_socket_top_right"],
         help="Entity names to estimate OBBs for"
     )
     parser.add_argument(

@@ -62,12 +62,15 @@ ENTITY_PROMPTS = {
 # These come from visual triangulation in robotics_project/triangulate_visual.py.
 # Used as initial anchor to project a prompt point into each frame for SAM.
 ENTITY_PRIOR_CENTER = {
-    "vga_socket":      VGA_CENTER,
-    "ethernet_socket": [0.29270, 0.21600, 0.75620],
-    "power_socket":    [0.29110, 0.21500, 0.52610],
-    # Bonus ports (single-frame backprojection from frame 468, depth ≈ 0.622 m)
-    "usb_socket":      [0.2700, 0.1999, 0.7738],   # USB 3.0 block (two stacked Type-A)
-    "audio_socket":    [0.2669, 0.1932, 0.7335],   # 3.5mm line-out / speaker jack
+    "vga_socket":          VGA_CENTER,
+    "ethernet_socket":     [0.29270, 0.21600, 0.75620],
+    "power_socket":        [0.29110, 0.21500, 0.52610],
+    # New entities (backprojected from frame 468 at panel depth ~0.616m)
+    "hdmi_socket_left":    [0.2607, 0.2210, 0.8073],   # leftmost HDMI just below VGA
+    "usb_socket_top_right": [0.2903, 0.2334, 0.8783],  # rightmost USB above VGA
+    # Legacy entries (kept for backward compatibility)
+    "usb_socket":          [0.2700, 0.1999, 0.7738],
+    "audio_socket":        [0.2669, 0.1932, 0.7335],
 }
 
 # ── Per-entity physical full dimensions (width × height in metres) ─────────────
@@ -76,22 +79,28 @@ ENTITY_PRIOR_CENTER = {
 # RJ-45:   16mm × 13mm (port opening)
 # VGA D-Sub 15: GT-confirmed ~71mm × 24mm bounding region
 ENTITY_PHYSICAL_WH_M = {
-    "vga_socket":      (0.0708, 0.0236),   # from GT extent * 2
-    "ethernet_socket": (0.018, 0.015),      # RJ45 full size
-    "power_socket":    (0.050, 0.032),      # IEC C14 outer
+    "vga_socket":           (0.0708, 0.0236),  # from GT extent * 2
+    "ethernet_socket":      (0.018, 0.015),    # RJ45 full size
+    "power_socket":         (0.050, 0.032),    # IEC C14 outer
+    "hdmi_socket_left":     (0.015, 0.007),    # full-size HDMI-A housing
+    "usb_socket_top_right": (0.013, 0.006),   # single USB-A port housing
 }
 
-# ── Calibrated OBB half-extents (metres) — used as fallback in pipeline ───────
-# Calibrated from VGA GT: GT ≈ 0.77× physical horizontal, 0.97× physical vertical.
-# Depth axis (axis0 = panel normal) = VGA GT value for all ports (triangulation smear).
-# Format: [depth_half, horizontal_half, vertical_half]
-VGA_DEPTH_HALF = VGA_EXTENT[0]   # 0.035378 m
+# ── Calibrated OBB extents (metres) — FULL edge lengths ───────────────────────
+# Convention: extent[i] = full edge length; corners = center + R * (± extent/2)
+# Depth axis (axis0 = panel normal) = 2 × VGA GT half-extent for all ports.
+# Format: [depth_full, horizontal_full, vertical_full]
+VGA_DEPTH_HALF = VGA_EXTENT[0]         # 0.035378 m (kept for reference)
+VGA_DEPTH_FULL = VGA_EXTENT[0] * 2     # 0.070756 m full edge
 ENTITY_CALIBRATED_EXTENT = {
-    "vga_socket":      VGA_EXTENT,                                        # GT
-    "ethernet_socket": [VGA_DEPTH_HALF, 0.006051, 0.006588],             # RJ45 body
-    "power_socket":    [VGA_DEPTH_HALF, 0.011107, 0.009760],             # IEC C14 face
-    "usb_socket":      [VGA_DEPTH_HALF, 0.005592, 0.011712],             # 2× USB-A stack
-    "audio_socket":    [VGA_DEPTH_HALF, 0.003447, 0.004392],             # 3.5mm jack
+    "vga_socket":           [x * 2 for x in VGA_EXTENT],                        # GT doubled
+    "ethernet_socket":      [VGA_DEPTH_FULL, 0.012102, 0.013176],               # RJ45 body
+    "power_socket":         [VGA_DEPTH_FULL, 0.022214, 0.019520],               # IEC C14 face
+    "hdmi_socket_left":     [VGA_DEPTH_FULL, 0.011550, 0.006790],               # HDMI-A housing
+    "usb_socket_top_right": [VGA_DEPTH_FULL, 0.010010, 0.005820],              # USB-A single port
+    # Legacy
+    "usb_socket":           [VGA_DEPTH_FULL, 0.011184, 0.023424],
+    "audio_socket":         [VGA_DEPTH_FULL, 0.006894, 0.008784],
 }
 
 # ── Detection / filtering parameters ─────────────────────────────────────────
